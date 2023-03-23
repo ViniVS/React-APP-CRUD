@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -34,54 +34,45 @@ export default function UserUpdate() {
   const [email, setEmail] = useState('');
 
   const [cpfCnpj, setCpfCnpj] = useState('');
+  const [date, setDate] = useState("");
   const [isError, setIsError] = useState(false);
   const classes = useStyles();
 
   const { id } = useParams();
-  useEffect(() => {
-    fetch("https://fakestoreapi.com/users/"+id)
-      .then(res => res.json())
-      .then(
-        (result) => {
-          setFname(result.user.firstname)
-          setLname(result.user.lastname)
-          setUsername(result.user.username)
-          setEmail(result.user.email)
-          setCpfCnpj(result.user.cpfCnpj)
-          
-        }
-      )
-  }, [id])
+  const parsedId = parseInt(id);
+  
 
   const handleSubmit = event => {
     event.preventDefault();
     var data = {
-      'id': id,
+      'id': parsedId,
       'firstname': firstname,
       'lastname': lastname,
       'username': username,
       'email': email,
       'cpfCpnj': cpfCnpj,
+      'DATE': date,
 
     }
-    fetch('https://fakestoreapi.com/users/'+id, {
-      method: 'PUT',
-      headers: {
-        Accept: 'application/form-data',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-    .then(res => res.json())
-    .then(
-      (result) => {
-        alert(result['message'])
-        if (result['status'] === 'ok') {
-          window.location.href = '/';
-        }
-      }
-    )
   }
+    
+  const handleUpdateUser = (parsedId) => {
+      fetch(`https://r4wj0utagf.execute-api.us-east-1.amazonaws.com/prod/edituser?id=${id}&varfirstName=${firstname}&varlastName=${lastname}&varEmail=${email}&varUserName=${username}&varCpfCnpj=${cpfCnpj}&varDate=${date}`, {
+        method: 'GET'
+      })
+        .then((res) => {
+          if (res.status === 200) {
+            window.location.href = '/';
+          } else {
+            console.log(parsedId)
+            window.alert(id)
+            throw new Error(`Failed to update user. Status code: ${id}`);
+          }
+        })
+    };
+
+
+
 
 
 
@@ -161,6 +152,17 @@ export default function UserUpdate() {
                   helperText={isError ? 'Digite apenas números' : ''}
                 />
             </Grid>
+            <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="DATE"
+                  label="Data"
+                  onChange={(e) => setDate(e.target.value)}
+                  
+                />
+            </Grid>
 
           </Grid>
           <Button
@@ -168,6 +170,7 @@ export default function UserUpdate() {
             fullWidth
             variant="contained"
             color="primary"
+            onClick={handleUpdateUser} 
             className={classes.submit}
           >
             Update
