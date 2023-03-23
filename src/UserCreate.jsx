@@ -98,7 +98,7 @@ export default function UserCreate() {
           throw new Error(`Failed to Create. Status code: ${res.status}`);
         }
       })
-      history.push("/");
+      history.push("/Users");
   };
 
  
